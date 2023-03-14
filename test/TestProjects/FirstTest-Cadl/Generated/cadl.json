@@ -2074,9 +2074,7 @@
   },
   "OAuth2": {
    "$id": "211",
-   "Scopes": [
-    "https://api.example.com/.default"
-   ]
+   "Scopes": []
   }
  }
 }

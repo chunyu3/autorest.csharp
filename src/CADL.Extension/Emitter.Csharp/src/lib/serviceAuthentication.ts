@@ -28,6 +28,13 @@ export function processServiceAuthentication(
                         }
                     }
                     break;
+                case "http":
+                    if (schema.scheme === "bearer") {
+                        scopes ??= new Set<string>();
+                    } else {
+                        throw new Error("Not supported authentication.");
+                    }
+                    break;
                 default:
                     throw new Error("Not supported authentication.");
             }

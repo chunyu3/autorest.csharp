@@ -17,7 +17,7 @@ import "@azure-tools/cadl-azure-core";
         firstTestCadlUrl: string,
     }
 )
-@useAuth(OAuth2Auth<[AuthFlow]> | ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
+@useAuth(BearerAuth | ApiKeyAuth<ApiKeyLocation.header, "x-ms-api-key">)
 namespace CadlFirstTest;
 
 model AuthFlow {
