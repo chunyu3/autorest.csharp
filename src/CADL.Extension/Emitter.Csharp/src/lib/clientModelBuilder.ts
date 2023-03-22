@@ -24,7 +24,8 @@ import {
     getServers,
     HttpOperation,
     getAllHttpServices,
-    getHttpOperation
+    getHttpOperation,
+    getHttpService
 } from "@typespec/http";
 import { getVersions } from "@typespec/versioning";
 import { NetEmitterOptions } from "../options.js";
@@ -149,10 +150,12 @@ export function createModelForService(
             urlParameters = cadlServers[0].parameters;
         }
     }
-    const [services] = getAllHttpServices(program);
-    const routes = services[0].operations;
+    // const [services] = getAllHttpServices(program);
+    // const routes = services[0].operations;
+    const httpService = ignoreDiagnostics(getHttpService(program, service.type));
+    const routes = httpService.operations;
     if (routes.length === 0) {
-        throw `No Route for service ${services[0].namespace.name}`;
+        throw `No Route for service ${httpService.namespace.name}`;
     }
     logger.info("routes:" + routes.length);
 

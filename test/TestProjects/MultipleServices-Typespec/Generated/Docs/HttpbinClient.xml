@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="StatusAsync(Int32,RequestContext)">
+<example>
+This sample shows how to call StatusAsync with required parameters.
+<code><![CDATA[
+var endpoint = new Uri("<https://my-service.azure.com>");
+var client = new HttpbinClient(endpoint);
+
+Response response = await client.StatusAsync(1234);
+Console.WriteLine(response.Status);
+]]></code>
+</example>
+    </member>
+    <member name="Status(Int32,RequestContext)">
+<example>
+This sample shows how to call Status with required parameters.
+<code><![CDATA[
+var endpoint = new Uri("<https://my-service.azure.com>");
+var client = new HttpbinClient(endpoint);
+
+Response response = client.Status(1234);
+Console.WriteLine(response.Status);
+]]></code>
+</example>
+    </member>
+  </members>
+</doc>

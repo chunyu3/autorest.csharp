@@ -3,6 +3,7 @@
 
 import {
     createCadlLibrary,
+    listServices,
     Program,
     resolvePath,
     Service,
@@ -20,7 +21,7 @@ import {
     resolveOptions,
     resolveOutputFolder
 } from "./options.js";
-import { createModel } from "./lib/clientModelBuilder.js";
+import { createModel, createModelForService } from "./lib/clientModelBuilder.js";
 import { logger, LoggerLevel } from "./lib/logger.js";
 import { cadlOutputFileName, configurationFileName } from "./constants.js";
 
@@ -44,111 +45,125 @@ export async function $onEmit(context: EmitContext<NetEmitterOptions>) {
 
     if (!program.compilerOptions.noEmit && !program.hasError()) {
         // Write out the dotnet model to the output path
-        const root = createModel(context);
-        const namespace = root.Name;
-        // await program.host.writeFile(outPath, prettierOutput(JSON.stringify(root, null, 2)));
-        if (root) {
-            const generatedFolder = resolvePath(outputFolder, "Generated");
+        const services = listServices(context.program);
+        if (services.length === 0) {
+            services.push({ type: context.program.getGlobalNamespaceType() });
+        }
 
-            //resolve shared folders based on generator path override
-            const resolvedSharedFolders: string[] = [];
-            const sharedFolders = [
-                resolvePath(
-                    options.csharpGeneratorPath,
-                    "..",
-                    "Generator.Shared"
-                ),
-                resolvePath(
-                    options.csharpGeneratorPath,
-                    "..",
-                    "Azure.Core.Shared"
-                )
-            ];
-            for (const sharedFolder of sharedFolders) {
-                resolvedSharedFolders.push(
-                    path
-                        .relative(generatedFolder, sharedFolder)
-                        .replaceAll("\\", "/")
-                );
-            }
+        // // TODO: support multiple service. Current only chose the first service.
+        // const service = services[0];
+        // const serviceNamespaceType = service.type;
+        // if (serviceNamespaceType === undefined) {
+        //     throw Error("Can not emit yaml for a namespace that doesn't exist.");
+        // }
+        for (const service of services) {
+            const root = createModelForService(context, service);
+        //}
+            const namespace = root.Name;
+            // await program.host.writeFile(outPath, prettierOutput(JSON.stringify(root, null, 2)));
+            if (root) {
+                const generatedFolder = resolvePath(outputFolder, "Generated");
 
-            if (!fs.existsSync(generatedFolder)) {
-                fs.mkdirSync(generatedFolder, { recursive: true });
-            }
-
-            await program.host.writeFile(
-                resolvePath(generatedFolder, cadlOutputFileName),
-                prettierOutput(
-                    stringifyRefs(root, null, 1, PreserveType.Objects)
-                )
-            );
-
-            //emit configuration.json
-            const configurations = {
-                OutputFolder: ".",
-                Namespace: options.namespace ?? namespace,
-                LibraryName: options["library-name"] ?? null,
-                SharedSourceFolders: resolvedSharedFolders ?? [],
-                SingleTopLevelClient: options["single-top-level-client"],
-                "unreferenced-types-handling":
-                    options["unreferenced-types-handling"],
-                "model-namespace": options["model-namespace"],
-                ModelsToTreatEmptyStringAsNull:
-                    options["models-to-treat-empty-string-as-null"],
-                IntrinsicTypesToTreatEmptyStringAsNull: options[
-                    "models-to-treat-empty-string-as-null"
-                ]
-                    ? options[
-                          "additional-intrinsic-types-to-treat-empty-string-as-null"
-                      ].concat(
-                          [
-                              "Uri",
-                              "Guid",
-                              "ResourceIdentifier",
-                              "DateTimeOffset"
-                          ].filter(
-                              (item) =>
-                                  options[
-                                      "additional-intrinsic-types-to-treat-empty-string-as-null"
-                                  ].indexOf(item) < 0
-                          )
-                      )
-                    : undefined
-            } as Configuration;
-
-            await program.host.writeFile(
-                resolvePath(generatedFolder, configurationFileName),
-                prettierOutput(JSON.stringify(configurations, null, 2))
-            );
-
-            if (options.skipSDKGeneration !== true) {
-                const newProjectOption = options["new-project"]
-                    ? "--new-project"
-                    : "";
-
-                const debugFlag = options.debug ?? false ? " --debug" : "";
-
-                const command = `dotnet --roll-forward Major ${resolvePath(
-                    options.csharpGeneratorPath
-                )} --project-path ${outputFolder} ${newProjectOption} --clear-output-folder ${
-                    options["clear-output-folder"]
-                }${debugFlag}`;
-                logger.verbose(command);
-
-                try {
-                    execSync(command, { stdio: "inherit" });
-                } catch (error: any) {
-                    if (error.message) logger.info(error.message);
-                    if (error.stderr) logger.error(error.stderr);
-                    if (error.stdout) logger.verbose(error.stdout);
-                    throw error;
+                //resolve shared folders based on generator path override
+                const resolvedSharedFolders: string[] = [];
+                const sharedFolders = [
+                    resolvePath(
+                        options.csharpGeneratorPath,
+                        "..",
+                        "Generator.Shared"
+                    ),
+                    resolvePath(
+                        options.csharpGeneratorPath,
+                        "..",
+                        "Azure.Core.Shared"
+                    )
+                ];
+                for (const sharedFolder of sharedFolders) {
+                    resolvedSharedFolders.push(
+                        path
+                            .relative(generatedFolder, sharedFolder)
+                            .replaceAll("\\", "/")
+                    );
                 }
-            }
 
-            if (!options["save-inputs"]) {
-                // delete
-                deleteFile(resolvePath(generatedFolder, cadlOutputFileName));
-                deleteFile(resolvePath(generatedFolder, configurationFileName));
+                if (!fs.existsSync(generatedFolder)) {
+                    fs.mkdirSync(generatedFolder, { recursive: true });
+                }
+
+                await program.host.writeFile(
+                    resolvePath(generatedFolder, cadlOutputFileName),
+                    prettierOutput(
+                        stringifyRefs(root, null, 1, PreserveType.Objects)
+                    )
+                );
+
+                //emit configuration.json
+                const configurations = {
+                    OutputFolder: ".",
+                    Namespace: options.namespace ?? namespace,
+                    LibraryName: options["library-name"] ?? null,
+                    SharedSourceFolders: resolvedSharedFolders ?? [],
+                    SingleTopLevelClient: options["single-top-level-client"],
+                    "unreferenced-types-handling":
+                        options["unreferenced-types-handling"],
+                    "model-namespace": options["model-namespace"],
+                    ModelsToTreatEmptyStringAsNull:
+                        options["models-to-treat-empty-string-as-null"],
+                    IntrinsicTypesToTreatEmptyStringAsNull: options[
+                        "models-to-treat-empty-string-as-null"
+                    ]
+                        ? options[
+                            "additional-intrinsic-types-to-treat-empty-string-as-null"
+                        ].concat(
+                            [
+                                "Uri",
+                                "Guid",
+                                "ResourceIdentifier",
+                                "DateTimeOffset"
+                            ].filter(
+                                (item) =>
+                                    options[
+                                        "additional-intrinsic-types-to-treat-empty-string-as-null"
+                                    ].indexOf(item) < 0
+                            )
+                        )
+                        : undefined
+                } as Configuration;
+
+                await program.host.writeFile(
+                    resolvePath(generatedFolder, configurationFileName),
+                    prettierOutput(JSON.stringify(configurations, null, 2))
+                );
+
+                if (options.skipSDKGeneration !== true) {
+                    const newProjectOption = options["new-project"]
+                        ? "--new-project"
+                        : "";
+
+                    const debugFlag = options.debug ?? false ? " --debug" : "";
+
+                    const command = `dotnet --roll-forward Major ${resolvePath(
+                        options.csharpGeneratorPath
+                    )} --project-path ${outputFolder} ${newProjectOption} --clear-output-folder ${
+                        options["clear-output-folder"]
+                    }${debugFlag}`;
+                    logger.verbose(command);
+
+                    try {
+                        execSync(command, { stdio: "inherit" });
+                    } catch (error: any) {
+                        if (error.message) logger.info(error.message);
+                        if (error.stderr) logger.error(error.stderr);
+                        if (error.stdout) logger.verbose(error.stdout);
+                        throw error;
+                    }
+                }
+
+                if (!options["save-inputs"]) {
+                    // delete
+                    deleteFile(resolvePath(generatedFolder, cadlOutputFileName));
+                    deleteFile(resolvePath(generatedFolder, configurationFileName));
+                }
             }
         }
     }

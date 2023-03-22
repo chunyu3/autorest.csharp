@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <members>
+    <member name="GetServerOpAsync(Int32,RequestContext)">
+<example>
+This sample shows how to call GetServerOpAsync with required parameters.
+<code><![CDATA[
+var endpoint = new Uri("<https://my-service.azure.com>");
+var client = new ContosoClient(endpoint);
+
+Response response = await client.GetServerOpAsync(1234);
+Console.WriteLine(response.Status);
+]]></code>
+</example>
+    </member>
+    <member name="GetServerOp(Int32,RequestContext)">
+<example>
+This sample shows how to call GetServerOp with required parameters.
+<code><![CDATA[
+var endpoint = new Uri("<https://my-service.azure.com>");
+var client = new ContosoClient(endpoint);
+
+Response response = client.GetServerOp(1234);
+Console.WriteLine(response.Status);
+]]></code>
+</example>
+    </member>
+  </members>
+</doc>
