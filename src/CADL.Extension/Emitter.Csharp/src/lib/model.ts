@@ -475,8 +475,35 @@ export function getInputType(
             // Temporary part. Derived types may not be referenced directly by any operation
             // We should be able to remove it when https://github.com/Azure/cadl-azure/issues/1733 is closed
             if (model.DiscriminatorPropertyName && m.derivedModels) {
+                const discriminators: string[] = [];
                 for (const dm of m.derivedModels) {
                     getInputType(program, dm, models, enums);
+                    const discriminatorValue = getDiscriminatorValue(dm, model);
+                    if (discriminatorValue) discriminators.push(discriminatorValue);
+                }
+                /* add discriminator extensible enum. */
+                let discriminatorEnum = enums.get(model.DiscriminatorPropertyName);
+                if (!discriminatorEnum) {
+                    const allowValues: InputEnumTypeValue[] = [];
+                    for (const disValue of discriminators) {
+                        const member = {
+                            Name: disValue,
+                            Value: disValue
+                        } as InputEnumTypeValue;
+                        allowValues.push(member);
+                    }
+
+                    discriminatorEnum = {
+                        Name: model.DiscriminatorPropertyName,
+                        Namespace: model.Namespace,
+                        Accessibility: undefined, //TODO: need to add accessibility
+                        Description: "",
+                        EnumValueType: "String",
+                        AllowedValues: allowValues,
+                        IsExtensible: true,
+                        IsNullable: false
+                    } as InputEnumType;
+                    enums.set(model.DiscriminatorPropertyName, discriminatorEnum);
                 }
             }
         }
@@ -660,12 +687,17 @@ export function getUsages(
         }
         const affectTypes: string[] = [];
         if (typeName !== "") affectTypes.push(typeName);
-        if (type.kind === "Model" && type.templateArguments) {
+        if (typeName !== "" && type.kind === "Model" && type.templateArguments) {
             for (const arg of type.templateArguments) {
                 if (arg.kind === "Model" && "name" in arg && arg.name !== "") {
                     affectTypes.push(getFriendlyName(program, arg) ?? arg.name);
                 }
             }
+        }
+
+        if (type.kind === "Model") {
+            const discriminator = getDiscriminator(program, type);
+            if (discriminator) affectTypes.push(discriminator.propertyName);
         }
 
         for (const name of affectTypes) {
