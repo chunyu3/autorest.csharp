@@ -12,5 +12,7 @@ namespace Azure.Core
         OriginalUri,
         OperationLocation,
         LocationOverride,
+        CustomLink,
+        CustomOperationReference
     }
 }

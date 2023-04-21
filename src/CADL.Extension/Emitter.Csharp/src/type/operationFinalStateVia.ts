@@ -4,5 +4,19 @@
 export enum OperationFinalStateVia {
     AzureAsyncOperation,
     Location,
-    OriginalUri
+    OriginalUri,
+    OperationLocation,
+    LocationOverride,
+    CustomLink,
+    CustomOperationReference
 }
+
+export const operationFinalStateViaMap: { [key: string]: OperationFinalStateVia } = {
+    "azure-async-operation": OperationFinalStateVia.AzureAsyncOperation,
+    "Location": OperationFinalStateVia.Location,
+    "original-uri": OperationFinalStateVia.OriginalUri,
+    "operation-location": OperationFinalStateVia.OperationLocation,
+    "location-override": OperationFinalStateVia.LocationOverride,
+    "custom-link": OperationFinalStateVia.CustomLink,
+    "custom-operation-reference": OperationFinalStateVia.CustomOperationReference
+};

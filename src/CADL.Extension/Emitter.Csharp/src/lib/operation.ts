@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
-import { getOperationLink } from "@azure-tools/typespec-azure-core";
+import { getOperationLink, getLroMetadata } from "@azure-tools/typespec-azure-core";
 import {
     createSdkContext,
     isApiVersion,
@@ -42,7 +42,7 @@ import {
     isInputLiteralType,
     isInputUnionType
 } from "../type/inputType.js";
-import { OperationFinalStateVia } from "../type/operationFinalStateVia.js";
+import { OperationFinalStateVia, operationFinalStateViaMap } from "../type/operationFinalStateVia.js";
 import { OperationLongRunning } from "../type/operationLongRunning.js";
 import { OperationPaging } from "../type/operationPaging.js";
 import { OperationResponse } from "../type/operationResponse.js";
@@ -189,7 +189,24 @@ export function loadOperation(
         }
     }
     /* TODO: handle lro */
-
+    let lro = undefined;
+    const lroMetadata = getLroMetadata(program, operation.operation);
+    if (lroMetadata) {
+        lro = {
+            FinalStateVia: operationFinalStateViaMap[lroMetadata.finalStateVia],
+            FinalResponse: {
+                StatusCodes: [200],
+                BodyType: lroMetadata.finalStep?.responseModel,
+                BodyMediaType: BodyMediaType.Json,
+                Headers: [],
+                IsErrorResponse: false
+            } as OperationResponse
+        } as OperationLongRunning;
+        // return {
+        //     FinalStateVia: OperationFinalStateVia.Location, // data plane only supports `location`
+        //     FinalResponse: finalResponse
+        // } as OperationLongRunning;
+    }
     return {
         Name: op.name,
         ResourceName:
@@ -207,11 +224,7 @@ export function loadOperation(
         ExternalDocsUrl: externalDocs?.url,
         RequestMediaTypes: mediaTypes.length > 0 ? mediaTypes : undefined,
         BufferResponse: true,
-        LongRunning: loadLongRunningOperation(
-            dpgContext,
-            operation,
-            resourceOperation
-        ),
+        LongRunning: lro,
         Paging: paging,
         GenerateProtocolMethod: generateProtocol,
         GenerateConvenienceMethod: generateConvenience
