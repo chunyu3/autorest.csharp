@@ -192,11 +192,18 @@ export function loadOperation(
     let lro = undefined;
     const lroMetadata = getLroMetadata(program, operation.operation);
     if (lroMetadata) {
+        let returnModel = lroMetadata.logicalResult;
+        if (!returnModel && lroMetadata.statusMonitorStep) {
+            returnModel = lroMetadata.statusMonitorStep.responseModel;
+        }
+        if (!returnModel && lroMetadata.finalStep) {
+            returnModel = lroMetadata.finalStep.responseModel;
+        }
         lro = {
             FinalStateVia: operationFinalStateViaMap[lroMetadata.finalStateVia],
             FinalResponse: {
                 StatusCodes: [200],
-                BodyType: lroMetadata.finalStep?.responseModel,
+                BodyType: returnModel ? getInputType(dpgContext, returnModel, models, enums): undefined,
                 BodyMediaType: BodyMediaType.Json,
                 Headers: [],
                 IsErrorResponse: false
