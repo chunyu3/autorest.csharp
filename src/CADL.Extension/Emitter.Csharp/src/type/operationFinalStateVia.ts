@@ -2,13 +2,13 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
 export enum OperationFinalStateVia {
-    AzureAsyncOperation,
-    Location,
-    OriginalUri,
-    OperationLocation,
-    LocationOverride,
-    CustomLink,
-    CustomOperationReference
+    AzureAsyncOperation = "AzureAsyncOperation",
+    Location = "Location",
+    OriginalUri = "OriginalUri",
+    OperationLocation = "OperationLocation",
+    LocationOverride = "LocationOverride",
+    CustomLink = "CustomLink",
+    CustomOperationReference = "CustomOperationReference"
 }
 
 export const operationFinalStateViaMap: { [key: string]: OperationFinalStateVia } = {
