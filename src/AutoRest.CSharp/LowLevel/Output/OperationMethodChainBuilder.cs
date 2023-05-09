@@ -163,14 +163,23 @@ namespace AutoRest.CSharp.Output.Models
         {
             var operationBodyTypes = Operation.Responses.Where(r => !r.IsErrorResponse).Select(r => r.BodyType).Distinct().ToArray();
             CSharpType? responseType = null;
-            if (operationBodyTypes.Length != 0)
+            if (Operation.LongRunning != null)
             {
-                var firstBodyType = operationBodyTypes[0];
-                if (firstBodyType != null)
+                if (Operation.LongRunning.FinalResponse.BodyType != null)
                 {
-                    responseType = TypeFactory.GetOutputType(_typeFactory.CreateType(firstBodyType));
+                    responseType = TypeFactory.GetOutputType(_typeFactory.CreateType(Operation.LongRunning.FinalResponse.BodyType));
                 }
-            };
+            } else
+            {
+                if (operationBodyTypes.Length != 0)
+                {
+                    var firstBodyType = operationBodyTypes[0];
+                    if (firstBodyType != null)
+                    {
+                        responseType = TypeFactory.GetOutputType(_typeFactory.CreateType(firstBodyType));
+                    }
+                };
+            }
 
             if (Operation.Paging != null)
             {
@@ -198,6 +207,7 @@ namespace AutoRest.CSharp.Output.Models
                 if (Operation.LongRunning != null)
                 {
                     var convenienceMethodReturnType = new CSharpType(typeof(Operation<>), new CSharpType(typeof(Pageable<>), responseType));
+                    Console.WriteLine($"return type: {convenienceMethodReturnType.Name}");
                     return new ReturnTypeChain(convenienceMethodReturnType, typeof(Operation<Pageable<BinaryData>>), responseType);
                 }
 

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
-import { getOperationLink, getLroMetadata } from "@azure-tools/typespec-azure-core";
+import { getOperationLink, getLroMetadata, LroMetadata, FinalStateValue } from "@azure-tools/typespec-azure-core";
 import {
     createSdkContext,
     isApiVersion,
@@ -20,13 +20,15 @@ import {
     ModelProperty,
     Namespace,
     Operation,
-    Program
+    Program,
+    ignoreDiagnostics
 } from "@typespec/compiler";
 import { getResourceOperation, ResourceOperation } from "@typespec/rest";
 import {
     HttpOperation,
     HttpOperationParameter,
-    HttpOperationResponse
+    HttpOperationResponse,
+    getHttpOperation
 } from "@typespec/http";
 import { NetEmitterOptions } from "../options.js";
 import { BodyMediaType, typeToBodyMediaType } from "../type/bodyMediaType.js";
@@ -189,31 +191,20 @@ export function loadOperation(
             }
         }
     }
-    /* TODO: handle lro */
+
     let lro = undefined;
     const lroMetadata = getLroMetadata(program, operation.operation);
     if (lroMetadata) {
-        let returnModel = lroMetadata.logicalResult;
-        if (!returnModel && lroMetadata.statusMonitorStep) {
-            returnModel = lroMetadata.statusMonitorStep.responseModel;
-        }
-        if (!returnModel && lroMetadata.finalStep) {
-            returnModel = lroMetadata.finalStep.responseModel;
-        }
         lro = {
             FinalStateVia: operationFinalStateViaMap[lroMetadata.finalStateVia],
             FinalResponse: {
-                StatusCodes: [200],
-                BodyType: returnModel ? getInputType(sdkContext, returnModel, models, enums): undefined,
+                StatusCodes: [lroMetadata.logicalResult ? 200: 204],
+                BodyType: lroMetadata.logicalResult ? getInputType(sdkContext, lroMetadata.logicalResult, models, enums): undefined,
                 BodyMediaType: BodyMediaType.Json,
                 Headers: [],
                 IsErrorResponse: false
             } as OperationResponse
         } as OperationLongRunning;
-        // return {
-        //     FinalStateVia: OperationFinalStateVia.Location, // data plane only supports `location`
-        //     FinalResponse: finalResponse
-        // } as OperationLongRunning;
     }
     return {
         Name: op.name,
