@@ -13,6 +13,8 @@
         "authentication/union",
         "azure/core/basic",
         "azure/core/traits",
+        "azure/core/lro/standard",
+        "azure/core/lro/rpc",
         "azure/client-generator-core/internal",
         "projection/projected-name",
         "server/path/multiple",
