@@ -14,6 +14,7 @@ import {
     EmitContext,
     getDeprecated,
     getDoc,
+    getFormat,
     getSummary,
     isErrorModel,
     Model,
@@ -42,6 +43,7 @@ import {
     InputEnumType,
     InputListType,
     InputModelType,
+    InputPrimitiveType,
     InputType,
     isInputLiteralType,
     isInputUnionType
@@ -63,9 +65,11 @@ import { logger } from "./logger.js";
 import {
     getDefaultValue,
     getEffectiveSchemaType,
+    getFormattedType,
     getInputType
 } from "./model.js";
 import { capitalize } from "./utils.js";
+import { FormattedType } from "../type/formattedType.js";
 
 export function loadOperation(
     context: EmitContext<NetEmitterOptions>,
@@ -236,15 +240,15 @@ export function loadOperation(
     ): InputParameter {
         const { type: location, name, param } = parameter;
         const format = parameter.type === "path" ? undefined : parameter.format;
-        const cadlType = param.type;
+        const typespecType = param.type;
         const inputType: InputType = getInputType(
             context,
-            cadlType,
+            getFormattedType(program, param),
             models,
             enums
         );
         let defaultValue = undefined;
-        const value = getDefaultValue(cadlType);
+        const value = getDefaultValue(typespecType);
         if (value) {
             defaultValue = {
                 Type: inputType,
@@ -293,7 +297,12 @@ export function loadOperation(
         body: ModelProperty | Model
     ): InputParameter {
         const type = body.kind === "Model" ? body : body.type;
-        const inputType: InputType = getInputType(context, type, models, enums);
+        const inputType: InputType = getInputType(
+            context,
+            getFormattedType(program, body),
+            models,
+            enums
+        );
         const requestLocation = RequestLocation.Body;
         const kind: InputOperationParameterKind =
             InputOperationParameterKind.Method;
@@ -332,15 +341,15 @@ export function loadOperation(
             if (resourceOperation && resourceOperation.operation !== "list") {
                 type = getInputType(
                     context,
-                    resourceOperation.resourceType,
+                    getFormattedType(program, resourceOperation.resourceType),
                     models,
                     enums
                 );
             } else {
-                const cadlType = getEffectiveSchemaType(context, body.type);
+                const typespecType = getEffectiveSchemaType(context, body.type);
                 const inputType: InputType = getInputType(
                     context,
-                    cadlType,
+                    getFormattedType(program, typespecType),
                     models,
                     enums
                 );
@@ -358,7 +367,7 @@ export function loadOperation(
                     Description: getDoc(program, headers[key]) ?? "",
                     Type: getInputType(
                         context,
-                        headers[key].type,
+                        getFormattedType(program, headers[key].type),
                         models,
                         enums
                     )

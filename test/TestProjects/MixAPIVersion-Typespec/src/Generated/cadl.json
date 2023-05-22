@@ -64,7 +64,7 @@
   },
   {
    "$id": "9",
-   "Name": "CustomPage",
+   "Name": "CustomPageToy",
    "Namespace": "Azure.Core.Foundations",
    "Description": "Paged collection of Toy items",
    "IsNullable": false,
@@ -146,7 +146,7 @@
      "Type": {
       "$id": "20",
       "Name": "ResourceLocation",
-      "Kind": "String",
+      "Kind": "Uri",
       "IsNullable": false
      },
      "IsRequired": false,
