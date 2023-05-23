@@ -14,6 +14,7 @@ import {
     EmitContext,
     getDeprecated,
     getDoc,
+    getEncode,
     getFormat,
     getSummary,
     isErrorModel,
@@ -69,7 +70,6 @@ import {
     getInputType
 } from "./model.js";
 import { capitalize } from "./utils.js";
-import { FormattedType } from "../type/formattedType.js";
 
 export function loadOperation(
     context: EmitContext<NetEmitterOptions>,

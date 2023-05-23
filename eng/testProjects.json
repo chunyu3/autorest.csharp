@@ -16,6 +16,7 @@
         "azure/core/lro/standard",
         "azure/core/lro/rpc",
         "azure/client-generator-core/internal",
+        "encode/duration",
         "projection/projected-name",
         "server/path/multiple",
         "server/path/single",
