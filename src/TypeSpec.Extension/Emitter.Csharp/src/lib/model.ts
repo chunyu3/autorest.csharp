@@ -538,10 +538,10 @@ export function getInputType(
 
     function getInputModelForModel(m: Model): InputModelType {
         m = getEffectiveSchemaType(context, m) as Model;
+        const baseModel = getInputModelBaseType(m.baseModel);
         const name = getTypeName(context, m);
         let model = models.get(name);
         if (!model) {
-            const baseModel = getInputModelBaseType(m.baseModel);
             const properties: InputModelProperty[] = [];
 
             const discriminator = getDiscriminator(program, m);
