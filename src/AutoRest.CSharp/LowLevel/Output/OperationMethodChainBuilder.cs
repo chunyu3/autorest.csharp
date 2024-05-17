@@ -109,7 +109,7 @@ namespace AutoRest.CSharp.Output.Models
             var diagnostic = new Diagnostic($"{_clientName}.{_restClientMethod.Name}");
 
             var requestBodyType = Operation.Parameters.FirstOrDefault(p => p.Location == RequestLocation.Body)?.Type;
-            var responseBodyType = GetReturnedResponseInputType();
+            var (responseBodyType, isNullable) = GetReturnedResponseInputType();
 
             // samples will build below
             var samples = new List<DpgOperationSample>();
@@ -171,7 +171,7 @@ namespace AutoRest.CSharp.Output.Models
         private LongRunningResultRetrievalMethod? GetLongRunningResultRetrievalMethod(OperationLongRunning? longRunning)
         {
             if (longRunning is { ResultPath: not null })
-                return new(_typeFactory.CreateType(longRunning.ReturnType!), longRunning.FinalResponse.BodyType!.Name, longRunning.ResultPath);
+                return new(_typeFactory.CreateType(longRunning.ReturnType!, longRunning.FinalResponse.IsNullable), longRunning.FinalResponse.BodyType!.Name, longRunning.ResultPath);
 
             return null;
         }
@@ -311,28 +311,27 @@ namespace AutoRest.CSharp.Output.Models
 
         private CSharpType? GetReturnedResponseCSharpType()
         {
-            var inputType = GetReturnedResponseInputType();
+            var (inputType, isNullable) = GetReturnedResponseInputType();
             if (inputType != null)
             {
-                return _typeFactory.CreateType(inputType).OutputType;
+                return _typeFactory.CreateType(inputType, isNullable).OutputType;
             }
             return null;
         }
 
-        private InputType? GetReturnedResponseInputType()
+        private (InputType? InputType, bool IsNullable) GetReturnedResponseInputType()
         {
             if (Operation.LongRunning != null)
             {
-                return Operation.LongRunning.ReturnType;
+                return (Operation.LongRunning.ReturnType, Operation.LongRunning.FinalResponse.IsNullable);
             }
-
-            var operationBodyTypes = Operation.Responses.Where(r => !r.IsErrorResponse).Select(r => r.BodyType).Distinct();
-            if (operationBodyTypes.Any())
+            var operationResponses = Operation.Responses.Where(r => !r.IsErrorResponse && r.BodyType != null).Distinct();
+            if (operationResponses.Any())
             {
-                return operationBodyTypes.First();
+                return (operationResponses.First().BodyType, operationResponses.First().IsNullable);
             }
 
-            return null;
+            return (null, false);
         }
 
         private IReadOnlyList<string>? GetReturnedResponseContentType()
@@ -628,7 +627,7 @@ namespace AutoRest.CSharp.Output.Models
 
         private void AddParameter(string name, InputParameter inputParameter, CSharpType? frameworkParameterType = null)
         {
-            var protocolMethodParameter = BuildParameter(inputParameter, frameworkParameterType ?? ChangeTypeForProtocolMethod(inputParameter.Type));
+            var protocolMethodParameter = BuildParameter(inputParameter, frameworkParameterType ?? ChangeTypeForProtocolMethod(inputParameter.Type, inputParameter.IsNullable));
 
             AddReference(name, inputParameter, protocolMethodParameter, SerializationBuilder.GetSerializationFormat(inputParameter.Type));
             if (inputParameter.Kind is InputOperationParameterKind.Client or InputOperationParameterKind.Constant)
@@ -653,8 +652,8 @@ namespace AutoRest.CSharp.Output.Models
         private Parameter BuildParameter(in InputParameter operationParameter, CSharpType? typeOverride = null)
         {
             var type = typeOverride != null
-                ? typeOverride.WithNullable(operationParameter.Type.IsNullable)
-                : _typeFactory.CreateType(operationParameter.Type);
+                ? typeOverride.WithNullable(operationParameter.IsNullable)
+                : _typeFactory.CreateType(operationParameter.Type, operationParameter.IsNullable);
 
             return Parameter.FromInputParameter(operationParameter, type, _typeFactory, Operation.KeepClientDefaultValue);
         }
@@ -686,10 +685,10 @@ namespace AutoRest.CSharp.Output.Models
             return parameter;
         }
 
-        private CSharpType? ChangeTypeForProtocolMethod(InputType type) => type switch
+        private CSharpType? ChangeTypeForProtocolMethod(InputType type, bool isNullable) => type switch
         {
-            InputEnumType enumType => _typeFactory.CreateType(enumType.EnumValueType).WithNullable(enumType.IsNullable),
-            InputModelType modelType => new CSharpType(typeof(object), modelType.IsNullable),
+            InputEnumType enumType => _typeFactory.CreateType(enumType.EnumValueType, isNullable),
+            InputModelType modelType => new CSharpType(typeof(object), isNullable),
             _ => null
         };
 

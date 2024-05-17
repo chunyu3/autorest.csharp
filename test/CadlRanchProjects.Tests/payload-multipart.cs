@@ -1,7 +1,9 @@
 using System;
+using System.ClientModel.Primitives;
 using System.IO;
 using System.Threading.Tasks;
 using AutoRest.TestServer.Tests.Infrastructure;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using NUnit.Framework;
 using Payload.MultiPart;
 using Payload.MultiPart.Models;
@@ -20,6 +22,16 @@ namespace CadlRanchProjects.Tests
             var response = await new MultiPartClient(host, null).GetFormDataClient().BasicAsync(body);
             Assert.AreEqual(204, response.Status);
         });
+
+        [Test]
+        public void Payload_Multipart_FormData_Basic_sync()
+        {
+            MultiPartRequest body = new MultiPartRequest("123", File.OpenRead(SampleJpgPath));
+            BinaryData data = ModelReaderWriter.Write(body, new ModelReaderWriterOptions("MFD"));
+            var lenght = data.ToArray().Length;
+            var response = new MultiPartClient(new Uri("http://localhost:3000"), null).GetFormDataClient().Basic(body);
+            Assert.AreEqual(204, response.Status);
+        }
 
         [Test]
         public Task Payload_Multipart_FormData_JsonPart() => Test(async (host) =>

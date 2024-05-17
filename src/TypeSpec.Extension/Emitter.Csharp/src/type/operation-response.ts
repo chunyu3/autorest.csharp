@@ -12,4 +12,5 @@ export interface OperationResponse {
     Headers: HttpResponseHeader[];
     ContentTypes?: string[];
     IsErrorResponse: boolean;
+    IsNullable: boolean;
 }

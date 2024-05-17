@@ -28,7 +28,7 @@ namespace CollapseRequestCondition_LowLevel.Tests
             AzureKeyCredential credential = new AzureKeyCredential("<key>");
             RequestConditionCollapseClient client = CreateRequestConditionCollapseClient(endpoint, credential);
 
-            using RequestContent content = null;
+            using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
             Response response = await client.CollapsePutAsync(content);
         }
 

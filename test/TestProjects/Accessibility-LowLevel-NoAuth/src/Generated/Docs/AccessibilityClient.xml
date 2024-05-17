@@ -7,7 +7,7 @@ This sample shows how to call OperationAsync.
 <code><![CDATA[
 AccessibilityClient client = new AccessibilityClient();
 
-using RequestContent content = null;
+using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
 Response response = await client.OperationAsync(content);
 
 Console.WriteLine(response.Status);
@@ -28,7 +28,7 @@ This sample shows how to call Operation.
 <code><![CDATA[
 AccessibilityClient client = new AccessibilityClient();
 
-using RequestContent content = null;
+using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
 Response response = client.Operation(content);
 
 Console.WriteLine(response.Status);

@@ -20,7 +20,7 @@ namespace FirstTestTypeSpec.Tests
         {
         }
 
-        [Test]
+        [RecordedTest]
         [Ignore("Please remove the Ignore attribute to let the test method run")]
         public async Task EnumTest_CreateUnknownValue_ShortVersion()
         {

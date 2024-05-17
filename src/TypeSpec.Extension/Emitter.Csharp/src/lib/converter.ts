@@ -14,7 +14,6 @@ import {
     SdkEnumValueType,
     SdkModelPropertyType,
     SdkModelType,
-    SdkTupleType,
     SdkType,
     SdkUnionType,
     UsageFlags,
@@ -86,7 +85,7 @@ export function fromSdkType(
     if (sdkType.kind === "string")
         return fromStringType(context.program, sdkType);
     // TODO: offsetDateTime
-    if (sdkType.kind === "tuple") return fromTupleType(sdkType);
+    if (sdkType.kind === "tuple") return fromTupleType();
     if (sdkType.__raw?.kind === "Scalar") return fromScalarType(sdkType);
     // this happens for discriminator type, normally all other primitive types should be handled in scalar above
     // TODO: can we improve the type in TCGC around discriminator
@@ -141,7 +140,6 @@ export function fromSdkModelType(
             Accessibility: modelType.access,
             Deprecated: modelType.deprecation,
             Description: modelType.description,
-            IsNullable: modelType.nullable,
             DiscriminatorPropertyName: baseModelHasDiscriminator
                 ? undefined
                 : getDiscriminatorPropertyNameFromCurrentModel(modelType),
@@ -169,8 +167,7 @@ export function fromSdkModelType(
                       context,
                       models,
                       enums
-                  ),
-                  IsNullable: false
+                  )
               } as InputDictionaryType)
             : undefined;
         inputModelType.Properties = modelType.properties
@@ -241,7 +238,8 @@ export function fromSdkModelType(
                 FlattenedNames:
                     flattenedNamePrefixes.length > 0
                         ? flattenedNamePrefixes.concat(propertyType.name)
-                        : undefined
+                        : undefined,
+                IsNullable: propertyType.nullable
             };
 
             return [modelProperty];
@@ -317,13 +315,11 @@ export function fromSdkEnumType(
             Deprecated: enumType.deprecation,
             Description: enumType.description,
             IsExtensible: enumType.isFixed ? false : true,
-            IsNullable: enumType.nullable,
             Usage: fromUsageFlags(enumType.usage)
         };
         if (addToCollection) enums.set(enumName, newInputEnumType);
         inputEnumType = newInputEnumType;
     }
-    inputEnumType.IsNullable = enumType.nullable; // TO-DO: https://github.com/Azure/autorest.csharp/issues/4314
     return inputEnumType;
 }
 
@@ -381,17 +377,15 @@ function fromSdkDurationType(
         Name: fromDurationKnownEncoding(
             durationType.encode,
             durationType.wireType
-        ),
-        IsNullable: durationType.nullable
+        )
     } as InputPrimitiveType;
 }
 
 // TODO: tuple is not officially supported
-function fromTupleType(tupleType: SdkTupleType): InputIntrinsicType {
+function fromTupleType(): InputIntrinsicType {
     return {
         Kind: InputTypeKind.Intrinsic,
-        Name: InputIntrinsicTypeKind.Unknown,
-        IsNullable: tupleType.nullable
+        Name: InputIntrinsicTypeKind.Unknown
     } as InputIntrinsicType;
 }
 
@@ -411,8 +405,7 @@ function fromBytesType(bytesType: SdkBuiltInType): InputPrimitiveType {
 
     return {
         Kind: InputTypeKind.Primitive,
-        Name: fromBytesEncoding(bytesType.encode),
-        IsNullable: bytesType.nullable
+        Name: fromBytesEncoding(bytesType.encode)
     };
 }
 
@@ -448,8 +441,7 @@ function fromStringType(
     raw = raw ?? stringType.__raw;
     return {
         Kind: InputTypeKind.Primitive,
-        Name: fromStringFormat(raw),
-        IsNullable: stringType.nullable
+        Name: fromStringFormat(raw)
     };
 }
 
@@ -458,8 +450,7 @@ function fromSdkBuiltInType(builtInType: SdkBuiltInType): InputType {
         mapTcgcTypeToCSharpInputTypeKind(builtInType);
     return {
         Kind: InputTypeKind.Primitive,
-        Name: builtInKind,
-        IsNullable: builtInType.nullable
+        Name: builtInKind
     } as InputPrimitiveType;
 }
 
@@ -545,8 +536,7 @@ function fromScalarType(scalarType: SdkType): InputPrimitiveType {
             scalarType.kind,
             scalarType.kind,
             undefined // To-DO: encode not compatible
-        ),
-        IsNullable: scalarType.nullable
+        )
     };
 
     function getCSharpInputTypeKindByPrimitiveModelName(
@@ -670,8 +660,7 @@ function fromIntrinsicType(scalarType: SdkType): InputIntrinsicType {
         Kind: InputTypeKind.Intrinsic,
         Name: getCSharpInputTypeKindByIntrinsic(
             scalarType.__raw! as IntrinsicType
-        ),
-        IsNullable: false
+        )
     };
 }
 
@@ -691,8 +680,7 @@ function fromUnionType(
         ? {
               Kind: InputTypeKind.Union,
               Name: InputTypeKind.Union,
-              UnionItemTypes: itemTypes,
-              IsNullable: false
+              UnionItemTypes: itemTypes
           }
         : itemTypes[0];
 }
@@ -716,8 +704,7 @@ function fromSdkConstantType(
                       enums,
                       literalTypeContext
                   ),
-        Value: constantType.value,
-        IsNullable: false
+        Value: constantType.value
     };
 
     function convertConstantToEnum(
@@ -753,7 +740,6 @@ function fromSdkConstantType(
             Deprecated: undefined,
             Description: `The ${enumName}`, // TODO -- what should we put here?
             IsExtensible: true,
-            IsNullable: false,
             Usage: "None" // will be updated later
         };
         enums.set(enumName, enumType);
@@ -775,8 +761,7 @@ function fromSdkEnumValueTypeToConstantType(
             literalTypeContext === undefined
                 ? fromSdkBuiltInType(enumValueType.valueType as SdkBuiltInType) // TODO: TCGC fix
                 : fromSdkEnumType(enumValueType.enumType, context, enums),
-        Value: enumValueType.value,
-        IsNullable: false
+        Value: enumValueType.value
     };
 }
 
@@ -800,13 +785,7 @@ function fromSdkDictionaryType(
         Kind: InputTypeKind.Dictionary,
         Name: InputTypeKind.Dictionary,
         KeyType: fromSdkType(dictionaryType.keyType, context, models, enums),
-        ValueType: fromSdkType(
-            dictionaryType.valueType,
-            context,
-            models,
-            enums
-        ),
-        IsNullable: dictionaryType.nullable
+        ValueType: fromSdkType(dictionaryType.valueType, context, models, enums)
     };
 }
 
@@ -819,8 +798,7 @@ function fromSdkArrayType(
     return {
         Kind: InputTypeKind.Array,
         Name: InputTypeKind.Array,
-        ElementType: fromSdkType(arrayType.valueType, context, models, enums),
-        IsNullable: arrayType.nullable
+        ElementType: fromSdkType(arrayType.valueType, context, models, enums)
     };
 }
 

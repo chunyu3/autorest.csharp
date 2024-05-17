@@ -177,13 +177,21 @@ namespace Payload.MultiPart
 
         public override void WriteTo(Stream stream, CancellationToken cancellationToken = default)
         {
-#if NET6_0_OR_GREATER
-				_multipartContent.CopyTo(stream, default, cancellationToken);
-#else
+            //_multipartContent.CopyTo(stream, default, cancellationToken);
 #pragma warning disable AZC0107
             _multipartContent.CopyToAsync(stream).EnsureCompleted();
 #pragma warning restore AZC0107
+            /*
+#if NET6_0_OR_GREATER
+            Console.WriteLine("NET6_0_OR_GREATER");
+				_multipartContent.CopyTo(stream, default, cancellationToken);
+#else
+#pragma warning disable AZC0107
+            Console.WriteLine("not NET6_0_OR_GREATER");
+            _multipartContent.CopyToAsync(stream).EnsureCompleted();
+#pragma warning restore AZC0107
 #endif
+            */
         }
 
         public override async Task WriteToAsync(Stream stream, CancellationToken cancellationToken = default)

@@ -8,4 +8,5 @@ export interface HttpResponseHeader {
     NameInResponse: string;
     Description: string;
     Type: InputType;
+    IsNullable: boolean;
 }

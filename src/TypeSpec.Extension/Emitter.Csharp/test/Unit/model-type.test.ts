@@ -75,14 +75,14 @@ op test(@body input: Pet): Pet;
                     SerializedName: "kind",
                     Type: {
                         Kind: InputTypeKind.Primitive,
-                        Name: InputPrimitiveTypeKind.String,
-                        IsNullable: false
+                        Name: InputPrimitiveTypeKind.String
                     },
                     IsRequired: true,
                     IsReadOnly: false,
                     IsDiscriminator: true,
                     Description: "Discriminator",
-                    FlattenedNames: undefined
+                    FlattenedNames: undefined,
+                    IsNullable: false
                 } as InputModelProperty,
                 discriminatorProperty
             ),
@@ -195,13 +195,13 @@ op test(@body input: Pet): Pet;
                             }
                         ],
                         IsExtensible: false,
-                        IsNullable: false,
                         Usage: "RoundTrip"
                     },
                     IsRequired: true,
                     IsReadOnly: false,
                     IsDiscriminator: true,
-                    FlattenedNames: undefined
+                    FlattenedNames: undefined,
+                    IsNullable: false
                 } as InputModelProperty,
                 discriminatorProperty
             ),
@@ -328,13 +328,13 @@ op test(@body input: Pet): Pet;
                             }
                         ],
                         IsExtensible: false,
-                        IsNullable: false,
                         Usage: "RoundTrip"
                     },
                     IsRequired: true,
                     IsReadOnly: false,
                     IsDiscriminator: true,
-                    FlattenedNames: undefined
+                    FlattenedNames: undefined,
+                    IsNullable: false
                 } as InputModelProperty,
                 discriminatorProperty
             ),
@@ -477,13 +477,11 @@ op op5(@body body: ExtendsFooArray): ExtendsFooArray;
                     IsNullable: false,
                     KeyType: {
                         Kind: InputTypeKind.Primitive,
-                        Name: InputPrimitiveTypeKind.String,
-                        IsNullable: false
+                        Name: InputPrimitiveTypeKind.String
                     },
                     ValueType: {
                         Kind: InputTypeKind.Intrinsic,
-                        Name: InputIntrinsicTypeKind.Unknown,
-                        IsNullable: false
+                        Name: InputIntrinsicTypeKind.Unknown
                     }
                 } as InputDictionaryType,
                 extendsUnknownModel.InheritedDictionaryType
@@ -500,13 +498,11 @@ op op5(@body body: ExtendsFooArray): ExtendsFooArray;
                     IsNullable: false,
                     KeyType: {
                         Kind: InputTypeKind.Primitive,
-                        Name: InputPrimitiveTypeKind.String,
-                        IsNullable: false
+                        Name: InputPrimitiveTypeKind.String
                     },
                     ValueType: {
                         Kind: InputTypeKind.Primitive,
-                        Name: InputPrimitiveTypeKind.String,
-                        IsNullable: false
+                        Name: InputPrimitiveTypeKind.String
                     }
                 } as InputDictionaryType,
                 extendsStringModel.InheritedDictionaryType
@@ -520,16 +516,13 @@ op op5(@body body: ExtendsFooArray): ExtendsFooArray;
                 {
                     Kind: InputTypeKind.Dictionary,
                     Name: InputTypeKind.Dictionary,
-                    IsNullable: false,
                     KeyType: {
                         Kind: InputTypeKind.Primitive,
-                        Name: InputPrimitiveTypeKind.String,
-                        IsNullable: false
+                        Name: InputPrimitiveTypeKind.String
                     },
                     ValueType: {
                         Kind: InputTypeKind.Primitive,
-                        Name: InputPrimitiveTypeKind.Int32,
-                        IsNullable: false
+                        Name: InputPrimitiveTypeKind.Int32
                     }
                 } as InputDictionaryType,
                 extendsInt32Model.InheritedDictionaryType
@@ -543,11 +536,9 @@ op op5(@body body: ExtendsFooArray): ExtendsFooArray;
                 {
                     Kind: InputTypeKind.Dictionary,
                     Name: InputTypeKind.Dictionary,
-                    IsNullable: false,
                     KeyType: {
                         Kind: InputTypeKind.Primitive,
-                        Name: InputPrimitiveTypeKind.String,
-                        IsNullable: false
+                        Name: InputPrimitiveTypeKind.String
                     },
                     ValueType: fooModel
                 } as InputDictionaryType,
@@ -562,17 +553,14 @@ op op5(@body body: ExtendsFooArray): ExtendsFooArray;
                 {
                     Kind: InputTypeKind.Dictionary,
                     Name: InputTypeKind.Dictionary,
-                    IsNullable: false,
                     KeyType: {
                         Kind: InputTypeKind.Primitive,
-                        Name: InputPrimitiveTypeKind.String,
-                        IsNullable: false
+                        Name: InputPrimitiveTypeKind.String
                     },
                     ValueType: {
                         Kind: InputTypeKind.Array,
                         Name: InputTypeKind.Array,
-                        ElementType: fooModel,
-                        IsNullable: false
+                        ElementType: fooModel
                     }
                 } as InputDictionaryType,
                 extendsFooArrayModel.InheritedDictionaryType
@@ -669,16 +657,13 @@ op op5(@body body: IsFooArray): IsFooArray;
                 {
                     Kind: InputTypeKind.Dictionary,
                     Name: InputTypeKind.Dictionary,
-                    IsNullable: false,
                     KeyType: {
                         Kind: InputTypeKind.Primitive,
-                        Name: InputPrimitiveTypeKind.String,
-                        IsNullable: false
+                        Name: InputPrimitiveTypeKind.String
                     },
                     ValueType: {
                         Kind: InputTypeKind.Intrinsic,
-                        Name: InputIntrinsicTypeKind.Unknown,
-                        IsNullable: false
+                        Name: InputIntrinsicTypeKind.Unknown
                     }
                 } as InputDictionaryType,
                 isUnknownModel.InheritedDictionaryType
@@ -692,16 +677,13 @@ op op5(@body body: IsFooArray): IsFooArray;
                 {
                     Kind: InputTypeKind.Dictionary,
                     Name: InputTypeKind.Dictionary,
-                    IsNullable: false,
                     KeyType: {
                         Kind: InputTypeKind.Primitive,
-                        Name: InputPrimitiveTypeKind.String,
-                        IsNullable: false
+                        Name: InputPrimitiveTypeKind.String
                     },
                     ValueType: {
                         Kind: InputTypeKind.Primitive,
-                        Name: InputPrimitiveTypeKind.String,
-                        IsNullable: false
+                        Name: InputPrimitiveTypeKind.String
                     }
                 } as InputDictionaryType,
                 isStringModel.InheritedDictionaryType
@@ -715,16 +697,13 @@ op op5(@body body: IsFooArray): IsFooArray;
                 {
                     Kind: InputTypeKind.Dictionary,
                     Name: InputTypeKind.Dictionary,
-                    IsNullable: false,
                     KeyType: {
                         Kind: InputTypeKind.Primitive,
-                        Name: InputPrimitiveTypeKind.String,
-                        IsNullable: false
+                        Name: InputPrimitiveTypeKind.String
                     },
                     ValueType: {
                         Kind: InputTypeKind.Primitive,
-                        Name: InputPrimitiveTypeKind.Int32,
-                        IsNullable: false
+                        Name: InputPrimitiveTypeKind.Int32
                     }
                 } as InputDictionaryType,
                 isInt32Model.InheritedDictionaryType
@@ -738,11 +717,9 @@ op op5(@body body: IsFooArray): IsFooArray;
                 {
                     Kind: InputTypeKind.Dictionary,
                     Name: InputTypeKind.Dictionary,
-                    IsNullable: false,
                     KeyType: {
                         Kind: InputTypeKind.Primitive,
-                        Name: InputPrimitiveTypeKind.String,
-                        IsNullable: false
+                        Name: InputPrimitiveTypeKind.String
                     },
                     ValueType: fooModel
                 } as InputDictionaryType,
@@ -757,17 +734,14 @@ op op5(@body body: IsFooArray): IsFooArray;
                 {
                     Kind: InputTypeKind.Dictionary,
                     Name: InputTypeKind.Dictionary,
-                    IsNullable: false,
                     KeyType: {
                         Kind: InputTypeKind.Primitive,
-                        Name: InputPrimitiveTypeKind.String,
-                        IsNullable: false
+                        Name: InputPrimitiveTypeKind.String
                     },
                     ValueType: {
                         Kind: InputTypeKind.Array,
                         Name: InputTypeKind.Array,
-                        ElementType: fooModel,
-                        IsNullable: false
+                        ElementType: fooModel
                     }
                 } as InputDictionaryType,
                 isFooArrayModel.InheritedDictionaryType

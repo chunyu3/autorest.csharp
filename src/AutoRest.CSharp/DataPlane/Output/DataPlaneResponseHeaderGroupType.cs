@@ -28,7 +28,7 @@ namespace AutoRest.CSharp.Output.Models.Responses
         {
             ResponseHeader CreateResponseHeader(OperationResponseHeader header)
             {
-                CSharpType type = typeFactory.CreateType(header.Type);
+                CSharpType type = typeFactory.CreateType(header.Type, header.IsNullable);
 
                 return new ResponseHeader(
                     header.Name.ToCleanName(),

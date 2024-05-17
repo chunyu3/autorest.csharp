@@ -3,7 +3,7 @@
 
 namespace AutoRest.CSharp.Common.Input;
 
-internal abstract record InputType(string Name, bool IsNullable)
+internal abstract record InputType(string Name)
 {
     public InputTypeSerialization Serialization { get; init; } = InputTypeSerialization.Default;
 
@@ -15,14 +15,12 @@ internal abstract record InputType(string Name, bool IsNullable)
                 return new InputListType(
                     listType.Name,
                     listType.ElementType.GetCollectionEquivalent(inputType),
-                    listType.IsEmbeddingsVector,
-                    listType.IsNullable);
+                    listType.IsEmbeddingsVector);
             case InputDictionaryType dictionaryType:
                 return new InputDictionaryType(
                     dictionaryType.Name,
                     dictionaryType.KeyType,
-                    dictionaryType.ValueType.GetCollectionEquivalent(inputType),
-                    dictionaryType.IsNullable);
+                    dictionaryType.ValueType.GetCollectionEquivalent(inputType));
             default:
                 return inputType;
         }

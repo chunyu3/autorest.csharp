@@ -32,7 +32,7 @@ namespace AutoRest.CSharp.Output.Models.Types
                 // Skip the replaced model, e.g. the replaced ErrorResponse.
                 foreach (var (key, model) in _models)
                 {
-                    var type = TypeFactory.CreateType(key);
+                    var type = TypeFactory.CreateType(key, false);
                     if (type is { IsFrameworkType: false, Implementation: ModelTypeProvider implementation} && model == implementation)
                     {
                         yield return model;
@@ -122,7 +122,7 @@ namespace AutoRest.CSharp.Output.Models.Types
         {
             if (!_isTspInput)
             {
-                return TypeFactory.CreateType(enumType.EnumValueType);
+                return TypeFactory.CreateType(enumType.EnumValueType, false);
             }
 
             if (_enums.TryGetValue(enumType, out var typeProvider))
@@ -134,7 +134,7 @@ namespace AutoRest.CSharp.Output.Models.Types
         }
 
         public override CSharpType ResolveModel(InputModelType model)
-            => _models.TryGetValue(model, out var modelTypeProvider) ? modelTypeProvider.Type : new CSharpType(typeof(object), model.IsNullable);
+            => _models.TryGetValue(model, out var modelTypeProvider) ? modelTypeProvider.Type : new CSharpType(typeof(object), false);
 
         public override CSharpType? FindTypeByName(string originalName)
         {

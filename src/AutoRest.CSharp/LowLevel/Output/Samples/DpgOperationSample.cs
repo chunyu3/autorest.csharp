@@ -193,7 +193,7 @@ namespace AutoRest.CSharp.Output.Samples.Models
 
                 if (inputParameter.Type is InputModelType model && inputParameterName.Equals(inputParameter.Type.Name))
                 {
-                    var type = _typeFactory.CreateType(model);
+                    var type = _typeFactory.CreateType(model, inputParameter.IsNullable);
                     if (type != null)
                     {
                         yield return parameter with { Parameter = inputParameter with { Name = type.Name } };

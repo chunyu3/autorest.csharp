@@ -5,7 +5,9 @@ import {
     ModelProperty,
     Namespace,
     Operation,
-    Scalar
+    Scalar,
+    Type,
+    isNullType
 } from "@typespec/compiler";
 import {
     SdkContext,
@@ -105,4 +107,17 @@ export function createContentTypeOrAcceptParameter(
                   } as InputConstant)
                 : undefined
     } as InputParameter;
+}
+
+/** TODO: remove when adopt TCGC getAllOperations
+ * or when tcgc export isNullable api.
+ */
+export function isNullable(type: Type) {
+    if (type.kind === "Union") {
+        const NonNullableOptions = [...type.variants.values()]
+            .map((x) => x.type)
+            .filter((t) => !isNullType(t));
+        if (NonNullableOptions.length < type.variants.size) return true;
+    }
+    return false;
 }

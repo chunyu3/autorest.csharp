@@ -379,7 +379,7 @@ namespace AutoRest.CSharp.Output.Models
                 return parameter;
             }
 
-            var groupedByParameterType = _typeFactory.CreateType(groupedByParameter.Type);
+            var groupedByParameterType = _typeFactory.CreateType(groupedByParameter.Type, groupedByParameter.IsNullable);
             var (propertyName, propertyType) = groupedByParameterType.Implementation switch
             {
                 ModelTypeProvider modelType when modelType.Fields.GetFieldByParameterName(parameter.Name) is { } field => (field.Name, field.Type),
@@ -408,7 +408,7 @@ namespace AutoRest.CSharp.Output.Models
                 return new StreamResponseBody();
             }
 
-            CSharpType responseType = typeFactory.CreateType(bodyType).OutputType;
+            CSharpType responseType = typeFactory.CreateType(bodyType, response.IsNullable).OutputType;
             ObjectSerialization serialization = SerializationBuilder.Build(response.BodyMediaType, bodyType, responseType, null);
 
             return new ObjectResponseBody(responseType, serialization);
@@ -498,9 +498,9 @@ namespace AutoRest.CSharp.Output.Models
 
         private Parameter BuildParameter(in InputParameter operationParameter, Type? typeOverride = null)
         {
-            CSharpType type = typeOverride != null ? new CSharpType(typeOverride, operationParameter.Type.IsNullable) :
+            CSharpType type = typeOverride != null ? new CSharpType(typeOverride, operationParameter.IsNullable) :
                 // for apiVersion, we still convert enum type to enum value type
-                operationParameter is { IsApiVersion: true, Type: InputEnumType enumType } ? _typeFactory.CreateType(enumType.EnumValueType) : _typeFactory.CreateType(operationParameter.Type);
+                operationParameter is { IsApiVersion: true, Type: InputEnumType enumType } ? _typeFactory.CreateType(enumType.EnumValueType, operationParameter.IsNullable) : _typeFactory.CreateType(operationParameter.Type, operationParameter.IsNullable);
             return Parameter.FromInputParameter(operationParameter, type, _typeFactory);
         }
 

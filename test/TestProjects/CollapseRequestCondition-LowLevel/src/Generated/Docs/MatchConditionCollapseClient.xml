@@ -50,7 +50,7 @@ This sample shows how to call CollapsePutAsync.
 AzureKeyCredential credential = new AzureKeyCredential("<key>");
 MatchConditionCollapseClient client = new MatchConditionCollapseClient(credential);
 
-using RequestContent content = null;
+using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
 Response response = await client.CollapsePutAsync(content);
 
 Console.WriteLine(response.Status);
@@ -73,7 +73,7 @@ This sample shows how to call CollapsePut.
 AzureKeyCredential credential = new AzureKeyCredential("<key>");
 MatchConditionCollapseClient client = new MatchConditionCollapseClient(credential);
 
-using RequestContent content = null;
+using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
 Response response = client.CollapsePut(content);
 
 Console.WriteLine(response.Status);

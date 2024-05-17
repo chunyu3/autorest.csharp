@@ -84,7 +84,7 @@ namespace AutoRest.CSharp.Output.Models.Shared
         {
             { NameInRequest: var nameInRequest } when RequestHeader.ClientRequestIdHeaders.Contains(nameInRequest) => Constant.FromExpression($"message.{Configuration.ApiTypes.HttpMessageRequestName}.ClientRequestId", new CSharpType(typeof(string))),
             { NameInRequest: var nameInRequest } when RequestHeader.ReturnClientRequestIdResponseHeaders.Contains(nameInRequest) => new Constant("true", new CSharpType(typeof(string))),
-            { DefaultValue: not null } => BuilderHelpers.ParseConstant(operationParameter.DefaultValue.Value, typeFactory.CreateType(operationParameter.DefaultValue.Type)),
+            { DefaultValue: not null } => BuilderHelpers.ParseConstant(operationParameter.DefaultValue.Value, typeFactory.CreateType(operationParameter.DefaultValue.Type, operationParameter.IsNullable)),
             { NameInRequest: var nameInRequest } when nameInRequest.Equals(RequestHeader.RepeatabilityRequestId, StringComparison.OrdinalIgnoreCase) =>
                 // Guid.NewGuid()
                 Constant.FromExpression($"{nameof(Guid)}.{nameof(Guid.NewGuid)}()", new CSharpType(typeof(string))),

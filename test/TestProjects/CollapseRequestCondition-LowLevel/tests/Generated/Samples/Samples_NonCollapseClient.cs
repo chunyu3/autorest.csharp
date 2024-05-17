@@ -23,7 +23,7 @@ namespace CollapseRequestCondition_LowLevel.Samples
             AzureKeyCredential credential = new AzureKeyCredential("<key>");
             NonCollapseClient client = new NonCollapseClient(credential);
 
-            using RequestContent content = null;
+            using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
             Response response = client.IfMatchPut(content);
 
             Console.WriteLine(response.Status);
@@ -36,7 +36,7 @@ namespace CollapseRequestCondition_LowLevel.Samples
             AzureKeyCredential credential = new AzureKeyCredential("<key>");
             NonCollapseClient client = new NonCollapseClient(credential);
 
-            using RequestContent content = null;
+            using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
             Response response = await client.IfMatchPutAsync(content);
 
             Console.WriteLine(response.Status);
@@ -75,7 +75,7 @@ namespace CollapseRequestCondition_LowLevel.Samples
             AzureKeyCredential credential = new AzureKeyCredential("<key>");
             NonCollapseClient client = new NonCollapseClient(credential);
 
-            using RequestContent content = null;
+            using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
             Response response = client.IfNoneMatchPut(content);
 
             Console.WriteLine(response.Status);
@@ -88,7 +88,7 @@ namespace CollapseRequestCondition_LowLevel.Samples
             AzureKeyCredential credential = new AzureKeyCredential("<key>");
             NonCollapseClient client = new NonCollapseClient(credential);
 
-            using RequestContent content = null;
+            using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
             Response response = await client.IfNoneMatchPutAsync(content);
 
             Console.WriteLine(response.Status);

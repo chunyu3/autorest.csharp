@@ -27,7 +27,7 @@ namespace Accessibility_LowLevel_NoAuth.Tests
             Uri endpoint = null;
             AccessibilityClient client = CreateAccessibilityClient(endpoint);
 
-            using RequestContent content = null;
+            using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
             Response response = await client.OperationAsync(content);
         }
 

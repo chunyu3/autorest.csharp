@@ -54,7 +54,7 @@ This sample shows how to call PutNullAsync.
 AzureKeyCredential credential = new AzureKeyCredential("<key>");
 StringClient client = new StringClient(credential);
 
-using RequestContent content = null;
+using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
 Response response = await client.PutNullAsync(content);
 
 Console.WriteLine(response.Status);
@@ -77,7 +77,7 @@ This sample shows how to call PutNull.
 AzureKeyCredential credential = new AzureKeyCredential("<key>");
 StringClient client = new StringClient(credential);
 
-using RequestContent content = null;
+using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
 Response response = client.PutNull(content);
 
 Console.WriteLine(response.Status);

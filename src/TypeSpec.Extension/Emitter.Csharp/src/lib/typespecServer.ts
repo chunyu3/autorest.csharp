@@ -18,6 +18,7 @@ import { getDefaultValue, getInputType } from "./model.js";
 import { SdkContext } from "@azure-tools/typespec-client-generator-core";
 import { InputTypeKind } from "../type/input-type-kind.js";
 import { NetEmitterOptions } from "../options.js";
+import { isNullable } from "./utils.js";
 
 export interface TypeSpecServer {
     url: string;
@@ -72,7 +73,8 @@ export function resolveServers(
                 SkipUrlEncoding: false,
                 Explode: false,
                 Kind: InputOperationParameterKind.Client,
-                DefaultValue: defaultValue
+                DefaultValue: defaultValue,
+                IsNullable: isNullable(prop)
             };
 
             parameters.push(variable);
@@ -104,7 +106,8 @@ export function resolveServers(
                         IsNullable: false
                     } as InputPrimitiveType,
                     Value: server.url
-                } as InputConstant
+                } as InputConstant,
+                IsNullable: false
             };
             url = `{host}`;
             parameters.push(variable);

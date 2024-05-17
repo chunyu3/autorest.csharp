@@ -49,7 +49,7 @@ namespace AutoRest.CSharp.Output.Models.Types
 
                 // We represent property being optional by making it nullable (when it is a value type)
                 // Except in the case of collection where there is a special handling
-                var optionalViaNullability = inputModelProperty is { IsRequired: false, Type.IsNullable: false } &&
+                var optionalViaNullability = inputModelProperty is { IsRequired: false, IsNullable: false } &&
                                              !propertyType.IsCollection;
 
                 var existingMember = modelTypeMapping?.GetMemberByOriginalName(originalFieldName);
@@ -158,7 +158,7 @@ namespace AutoRest.CSharp.Output.Models.Types
         // TODO -- when we consolidate the schemas into input types, we should remove this method and move it into BuilderHelpers
         private static CSharpType CreateAdditionalPropertiesPropertyType(TypeFactory typeFactory, InputDictionaryType additionalPropertiesInputType)
         {
-            var originalType = typeFactory.CreateType(additionalPropertiesInputType);
+            var originalType = typeFactory.CreateType(additionalPropertiesInputType, false);
 
             return BuilderHelpers.CreateAdditionalPropertiesPropertyType(originalType, typeFactory.UnknownType);
         }
@@ -234,7 +234,7 @@ namespace AutoRest.CSharp.Output.Models.Types
             {
                 // nullable collection should be settable
                 // one exception is in the property bag, we never let them to be settable.
-                return !property.Type.IsNullable || isPropertyBag;
+                return !property.IsNullable || isPropertyBag;
             }
 
             // In mixed models required properties are not readonly
@@ -331,7 +331,7 @@ namespace AutoRest.CSharp.Output.Models.Types
 
         private static CSharpType GetPropertyDefaultType(in InputModelTypeUsage usage, in InputModelProperty property, TypeFactory typeFactory)
         {
-            var propertyType = typeFactory.CreateType(property.Type);
+            var propertyType = typeFactory.CreateType(property.Type, property.IsNullable);
 
             if (!usage.HasFlag(InputModelTypeUsage.Input) || property.IsReadOnly)
             {

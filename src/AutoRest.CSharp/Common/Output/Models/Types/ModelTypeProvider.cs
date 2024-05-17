@@ -521,7 +521,7 @@ namespace AutoRest.CSharp.Output.Models.Types
             }
 
             return _inputModel.BaseModel is { } baseModel
-                ? _typeFactory.CreateType(baseModel)
+                ? _typeFactory.CreateType(baseModel, false)
                 : null;
         }
 
@@ -822,7 +822,7 @@ namespace AutoRest.CSharp.Output.Models.Types
         {
             foreach (var derivedInputType in derivedInputTypes)
             {
-                var derivedModel = (ModelTypeProvider)_typeFactory.CreateType(derivedInputType).Implementation;
+                var derivedModel = (ModelTypeProvider)_typeFactory.CreateType(derivedInputType, false).Implementation;
                 foreach (var discriminatorImplementation in GetDerivedTypes(derivedModel._derivedModels))
                 {
                     yield return discriminatorImplementation;

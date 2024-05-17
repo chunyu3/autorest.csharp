@@ -57,14 +57,14 @@ namespace AutoRest.CSharp.Output.Models
             if (isTspInput)
             {
                 CreateModels(_rootNamespace.Models, models, library.TypeFactory, _sourceInputModel);
-                CreateEnums(_rootNamespace.Enums, enums, models, library.TypeFactory, _sourceInputModel);
+                CreateEnums(_rootNamespace.Enums, enums, library.TypeFactory, _sourceInputModel);
             }
             CreateClients(clients, topLevelClientInfos, library.TypeFactory, clientOptions, parametersInClientOptions);
 
             return library;
         }
 
-        public static void CreateEnums(IReadOnlyList<InputEnumType> inputEnums, IDictionary<InputEnumType, EnumType> enums, IDictionary<InputModelType, ModelTypeProvider> models, TypeFactory typeFactory, SourceInputModel? sourceInputModel)
+        public static void CreateEnums(IReadOnlyList<InputEnumType> inputEnums, IDictionary<InputEnumType, EnumType> enums, TypeFactory typeFactory, SourceInputModel? sourceInputModel)
         {
             foreach (var inputEnum in inputEnums)
             {
@@ -126,8 +126,7 @@ namespace AutoRest.CSharp.Output.Models
                     Array.Empty<InputModelType>(),
                     "Unknown", //TODO: do we need to support extensible enum / int values?
                     null,
-                    null,
-                    false)
+                    null)
                 {
                     IsUnknownDiscriminatorModel = true
                 };
@@ -174,7 +173,7 @@ namespace AutoRest.CSharp.Output.Models
                 {
                     Uri = $"{{{KnownParameters.Endpoint.Name}}}",
                     Parameters = operation.Parameters
-                        .Append(new InputParameter(KnownParameters.Endpoint.Name, KnownParameters.Endpoint.Name, $"{KnownParameters.Endpoint.Description}", new InputPrimitiveType(InputTypeKind.Uri, false), RequestLocation.Uri, null, null, null, InputOperationParameterKind.Client, true, false, false, false, true, false, false, null, null))
+                        .Append(new InputParameter(KnownParameters.Endpoint.Name, KnownParameters.Endpoint.Name, $"{KnownParameters.Endpoint.Description}", new InputPrimitiveType(InputTypeKind.Uri), RequestLocation.Uri, null, null, null, InputOperationParameterKind.Client, true, false, false, false, true, false, false, false, null, null))
                         .ToList()
                 };
             }

@@ -107,6 +107,9 @@ namespace Payload.MultiPart.Models
             using MultipartFormDataRequestContent content = ToMultipartRequestContent();
             using MemoryStream stream = new MemoryStream();
             content.WriteTo(stream);
+            stream.Position = 0;
+            return BinaryData.FromStream(stream);
+            /*
             if (stream.Position > int.MaxValue)
             {
                 return BinaryData.FromStream(stream);
@@ -115,6 +118,7 @@ namespace Payload.MultiPart.Models
             {
                 return new BinaryData(stream.GetBuffer().AsMemory(0, (int)stream.Position));
             }
+            */
         }
 
         internal virtual MultipartFormDataRequestContent ToMultipartRequestContent()

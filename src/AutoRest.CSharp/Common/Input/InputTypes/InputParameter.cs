@@ -22,6 +22,7 @@ internal record InputParameter(
     bool IsEndpoint,
     bool SkipUrlEncoding,
     bool Explode,
+    bool IsNullable,
     string? ArraySerializationDelimiter,
     string? HeaderCollectionPrefix)
 {
@@ -42,6 +43,7 @@ internal record InputParameter(
         IsEndpoint: false,
         SkipUrlEncoding: false,
         Explode: false,
+        IsNullable: false,
         ArraySerializationDelimiter: null,
         HeaderCollectionPrefix: null)
     { }

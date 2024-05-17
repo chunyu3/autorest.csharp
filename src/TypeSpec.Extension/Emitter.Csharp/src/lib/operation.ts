@@ -7,12 +7,14 @@ import {
     shouldGenerateConvenient,
     shouldGenerateProtocol,
     SdkContext,
-    getAccess
+    getAccess,
+    getSdkModelPropertyType
 } from "@azure-tools/typespec-client-generator-core";
 import {
     getDeprecated,
     getDoc,
     getSummary,
+    ignoreDiagnostics,
     isErrorModel,
     Model,
     ModelProperty,
@@ -65,7 +67,8 @@ import {
 import {
     capitalize,
     createContentTypeOrAcceptParameter,
-    getTypeName
+    getTypeName,
+    isNullable
 } from "./utils.js";
 import { Usage } from "../type/usage.js";
 import { InputTypeKind } from "../type/input-type-kind.js";
@@ -255,6 +258,9 @@ export function loadOperation(
         parameter: HttpOperationParameter
     ): InputParameter {
         const { type: location, name, param } = parameter;
+        const sdkParam = ignoreDiagnostics(
+            getSdkModelPropertyType(context, param)
+        );
         const format = parameter.type === "path" ? undefined : parameter.format;
         const typespecType = param.type;
         const inputType: InputType = getInputType(
@@ -305,7 +311,8 @@ export function loadOperation(
             Kind: kind,
             ArraySerializationDelimiter: format
                 ? collectionFormatToDelimMap[format]
-                : undefined
+                : undefined,
+            IsNullable: sdkParam.nullable
         } as InputParameter;
     }
 
@@ -379,7 +386,8 @@ export function loadOperation(
                         models,
                         enums,
                         operation.operation
-                    )
+                    ),
+                    IsNullable: isNullable(headers[key].type)
                 } as HttpResponseHeader);
             }
         }
@@ -390,7 +398,8 @@ export function loadOperation(
             BodyMediaType: BodyMediaType.Json,
             Headers: responseHeaders,
             IsErrorResponse: isErrorModel(program, response.type),
-            ContentTypes: body?.contentTypes
+            ContentTypes: body?.contentTypes,
+            IsNullable: body?.type ? isNullable(body?.type) : false
         } as OperationResponse;
     }
 
@@ -404,6 +413,7 @@ export function loadOperation(
         }
 
         let bodyType = undefined;
+        let nullable = false;
         if (
             op.verb !== "delete" &&
             metadata.finalResult !== undefined &&
@@ -416,6 +426,12 @@ export function loadOperation(
                 enums,
                 op.operation
             );
+            if (
+                metadata.finalEnvelopeResult !== undefined &&
+                (metadata.finalEnvelopeResult as Model)
+            ) {
+                nullable = isNullable(metadata.finalEnvelopeResult as Model);
+            }
         }
 
         return {
@@ -425,7 +441,8 @@ export function loadOperation(
                 // for now, let assume we don't allow return type
                 StatusCodes: op.verb === "delete" ? [204] : [200],
                 BodyType: bodyType,
-                BodyMediaType: BodyMediaType.Json
+                BodyMediaType: BodyMediaType.Json,
+                IsNullable: nullable
             } as OperationResponse,
             ResultPath: metadata.finalResultPath
         } as OperationLongRunning;

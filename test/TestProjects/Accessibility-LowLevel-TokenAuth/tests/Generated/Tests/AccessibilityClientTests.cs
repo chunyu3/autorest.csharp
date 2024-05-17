@@ -28,7 +28,7 @@ namespace Accessibility_LowLevel_TokenAuth.Tests
             TokenCredential credential = new DefaultAzureCredential();
             AccessibilityClient client = CreateAccessibilityClient(endpoint, credential);
 
-            using RequestContent content = null;
+            using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
             Response response = await client.OperationAsync(content);
         }
 

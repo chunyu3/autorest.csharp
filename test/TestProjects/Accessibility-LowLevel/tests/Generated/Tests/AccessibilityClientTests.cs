@@ -28,7 +28,7 @@ namespace Accessibility_LowLevel.Tests
             AzureKeyCredential credential = new AzureKeyCredential("<key>");
             AccessibilityClient client = CreateAccessibilityClient(endpoint, credential);
 
-            using RequestContent content = null;
+            using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
             Response response = await client.OperationAsync(content);
         }
 

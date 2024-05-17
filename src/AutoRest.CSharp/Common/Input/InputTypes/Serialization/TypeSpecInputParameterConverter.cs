@@ -43,6 +43,7 @@ namespace AutoRest.CSharp.Common.Input
             bool isEndpoint = false;
             bool skipUrlEncoding = false;
             bool explode = false;
+            bool isNullable = false;
             string? arraySerializationDelimiter = null;
             string? headerCollectionPrefix = null;
             while (reader.TokenType != JsonTokenType.EndObject)
@@ -63,6 +64,7 @@ namespace AutoRest.CSharp.Common.Input
                     || reader.TryReadBoolean(nameof(InputParameter.IsEndpoint), ref isEndpoint)
                     || reader.TryReadBoolean(nameof(InputParameter.SkipUrlEncoding), ref skipUrlEncoding)
                     || reader.TryReadBoolean(nameof(InputParameter.Explode), ref explode)
+                    || reader.TryReadBoolean(nameof(InputParameter.IsNullable), ref isNullable)
                     || reader.TryReadString(nameof(InputParameter.ArraySerializationDelimiter), ref arraySerializationDelimiter)
                     || reader.TryReadString(nameof(InputParameter.HeaderCollectionPrefix), ref headerCollectionPrefix);
 
@@ -105,6 +107,7 @@ namespace AutoRest.CSharp.Common.Input
                 IsEndpoint: isEndpoint,
                 SkipUrlEncoding: skipUrlEncoding,
                 Explode: explode,
+                IsNullable: isNullable,
                 ArraySerializationDelimiter: arraySerializationDelimiter,
                 HeaderCollectionPrefix: headerCollectionPrefix);
 

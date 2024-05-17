@@ -76,7 +76,7 @@ namespace body_string_LowLevel.Samples
             AzureKeyCredential credential = new AzureKeyCredential("<key>");
             StringClient client = new StringClient(credential);
 
-            using RequestContent content = null;
+            using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
             Response response = client.PutNull(content);
 
             Console.WriteLine(response.Status);
@@ -89,7 +89,7 @@ namespace body_string_LowLevel.Samples
             AzureKeyCredential credential = new AzureKeyCredential("<key>");
             StringClient client = new StringClient(credential);
 
-            using RequestContent content = null;
+            using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
             Response response = await client.PutNullAsync(content);
 
             Console.WriteLine(response.Status);

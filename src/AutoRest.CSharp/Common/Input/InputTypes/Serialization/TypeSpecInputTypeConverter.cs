@@ -17,7 +17,6 @@ namespace AutoRest.CSharp.Common.Input
         private const string DictionaryValueType = nameof(InputDictionaryType.ValueType);
         private const string EnumValueType = nameof(InputEnumType.EnumValueType);
         private const string EnumAllowedValues = nameof(InputEnumType.AllowedValues);
-        private const string IsNullableField = nameof(InputType.IsNullable);
         private const string UnionItemTypes = nameof(InputUnionType.UnionItemTypes);
 
         private readonly TypeSpecReferenceHandler _referenceHandler;
@@ -31,7 +30,7 @@ namespace AutoRest.CSharp.Common.Input
         {
             if (reader.TokenType == JsonTokenType.String)
             {
-                return CreatePrimitiveType(reader.GetString(), false);
+                return CreatePrimitiveType(reader.GetString());
             }
 
             return reader.ReadReferenceAndResolve<InputType>(_referenceHandler.CurrentResolver) ?? CreateObject(ref reader, options);
@@ -89,11 +88,9 @@ namespace AutoRest.CSharp.Common.Input
         public static InputPrimitiveType ReadPrimitiveType(ref Utf8JsonReader reader, string? id, string? name, ReferenceResolver resolver)
         {
             var isFirstProperty = id == null;
-            var isNullable = false;
             while (reader.TokenType != JsonTokenType.EndObject)
             {
                 var isKnownProperty = reader.TryReadReferenceId(ref isFirstProperty, ref id)
-                    || reader.TryReadBoolean(nameof(InputPrimitiveType.IsNullable), ref isNullable)
                     || reader.TryReadString(nameof(InputPrimitiveType.Name), ref name); // the primitive kind in the json is represented by the property `Name`.
 
                 if (!isKnownProperty)
@@ -102,7 +99,7 @@ namespace AutoRest.CSharp.Common.Input
                 }
             }
 
-            var primitiveType = CreatePrimitiveType(name, isNullable);
+            var primitiveType = CreatePrimitiveType(name);
             if (id != null)
             {
                 resolver.AddReference(id, primitiveType);
@@ -111,14 +108,14 @@ namespace AutoRest.CSharp.Common.Input
             return primitiveType;
         }
 
-        public static InputPrimitiveType CreatePrimitiveType(string? inputTypeKindString, bool isNullable)
+        public static InputPrimitiveType CreatePrimitiveType(string? inputTypeKindString)
         {
             if (inputTypeKindString == null)
             {
                 throw new ArgumentNullException(nameof(inputTypeKindString));
             }
             return Enum.TryParse<InputTypeKind>(inputTypeKindString, ignoreCase: true, out var kind)
-                ? new InputPrimitiveType(kind, isNullable)
+                ? new InputPrimitiveType(kind)
                 : throw new JsonException($"{inputTypeKindString} type is unknown.");
         }
 

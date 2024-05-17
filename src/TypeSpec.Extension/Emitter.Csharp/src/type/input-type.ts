@@ -10,7 +10,6 @@ import { InputTypeKind } from "./input-type-kind.js";
 export interface InputType {
     Name: string;
     Kind: InputTypeKind;
-    IsNullable: boolean;
 }
 
 export interface InputPrimitiveType extends InputType {
@@ -101,7 +100,6 @@ export function isInputDictionaryType(
 export interface InputIntrinsicType extends InputType {
     Kind: InputTypeKind.Intrinsic;
     Name: InputIntrinsicTypeKind;
-    IsNullable: false;
 }
 
 export function isInputIntrinsicType(

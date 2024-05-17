@@ -271,7 +271,7 @@ namespace AutoRest.CSharp.Output.Builders
                     isContent = inputModelProperty.Type.Serialization.Xml?.IsContent == true;
                     format = GetSerializationFormat(inputModelProperty.Type);
                     serializedName = inputModelProperty.SerializedName;
-                    serializedType = typeFactory.CreateType(inputModelProperty.Type);
+                    serializedType = typeFactory.CreateType(inputModelProperty.Type, inputModelProperty.IsNullable);
                     return true;
                 }
 
@@ -324,7 +324,7 @@ namespace AutoRest.CSharp.Output.Builders
 
             var valueSerialization = BuildJsonSerialization(inputModelProperty.Type, propertyType, false);
             var serializedName = serializationMapping?.SerializationPath?[^1] ?? inputModelProperty.SerializedName;
-            var serializedType = typeFactory.CreateType(inputModelProperty.Type);
+            var serializedType = typeFactory.CreateType(inputModelProperty.Type, inputModelProperty.IsNullable);
             var memberValueExpression = new TypedMemberExpression(null, declaredName, propertyType);
 
             return new JsonPropertySerialization(

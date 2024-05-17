@@ -22,7 +22,7 @@ namespace Accessibility_LowLevel_NoAuth.Samples
         {
             AccessibilityClient client = new AccessibilityClient();
 
-            using RequestContent content = null;
+            using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
             Response response = client.Operation(content);
 
             Console.WriteLine(response.Status);
@@ -34,7 +34,7 @@ namespace Accessibility_LowLevel_NoAuth.Samples
         {
             AccessibilityClient client = new AccessibilityClient();
 
-            using RequestContent content = null;
+            using RequestContent content = RequestContent.Create("<https://my-service.azure.com>");
             Response response = await client.OperationAsync(content);
 
             Console.WriteLine(response.Status);
