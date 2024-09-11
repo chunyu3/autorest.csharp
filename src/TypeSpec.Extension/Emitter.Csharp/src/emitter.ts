@@ -15,7 +15,7 @@ import {
     tspOutputFileName,
     setSDKContextOptions
 } from "@typespec/http-client-csharp";
-import { createSdkContext } from "@azure-tools/typespec-client-generator-core";
+import { parseRefs } from "json-serialize-refs";
 import {
     AzureNetEmitterOptions,
     resolveAzureEmitterOptions
@@ -80,14 +80,32 @@ export async function $onEmit(context: EmitContext<AzureNetEmitterOptions>) {
                 examplesDir
             );
         }
-        /* TODO: when we support to emit decorator list https://github.com/Azure/autorest.csharp/issues/4887, we will update to use emitted decorator to identify if it is azure-arm */
         /* set azure-arm */
-        const sdkContext = await createSdkContext(
-            context,
-            "@azure-tools/typespec-csharp"
+        const codeModel = parseRefs(
+            fs.readFileSync(
+                resolvePath(outputFolder, tspOutputFileName),
+                "utf-8"
+            )
         );
-        configurations["azure-arm"] =
-            sdkContext.arm === false ? undefined : sdkContext.arm;
+        const clients = codeModel["Clients"] as [];
+        let isAzureArm = false;
+        if (clients) {
+            clients.forEach((client) => {
+                const decorators = client["Decorators"] as [];
+                if (decorators) {
+                    decorators.forEach((decorator) => {
+                        if (
+                            decorator["name"] ===
+                            "Azure.ResourceManager.@armProviderNamespace"
+                        ) {
+                            isAzureArm = true;
+                        }
+                    });
+                }
+            });
+        }
+
+        if (isAzureArm) configurations["azure-arm"] = true;
         configurations["use-write-core"] = options["use-write-core"];
         await program.host.writeFile(
             resolvePath(outputFolder, configurationFileName),

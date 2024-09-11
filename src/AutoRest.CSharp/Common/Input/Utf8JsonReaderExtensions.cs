@@ -187,7 +187,7 @@ namespace AutoRest.CSharp.Common.Input
 
             reader.Read();
             var idRef = reader.GetString() ?? throw new JsonException("$ref can't be null");
-            var result = (T)resolver.ResolveReference(idRef ?? throw new JsonException());
+            var result = (T)resolver.ResolveReference(idRef ?? throw new JsonException("Can not resolve reference $ref"));
 
             reader.Read();
             if (reader.TokenType != JsonTokenType.EndObject)
